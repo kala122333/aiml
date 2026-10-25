@@ -1,0 +1,86 @@
+# Rule-Based Expert System
+# Forward Chaining and Backward Chaining
+
+facts = {
+    "fever",
+    "cough"
+}
+
+rules = [
+    ({"fever", "cough"}, "flu"),
+    ({"flu"}, "doctor_visit"),
+    ({"doctor_visit"}, "medicine")
+]
+
+# Forward Chaining
+def forward_chaining(facts, rules):
+    known = set(facts)
+    changed = True
+
+    print("\nForward Chaining:")
+
+    while changed:
+        changed = False
+
+        for conditions, conclusion in rules:
+            if conditions.issubset(known) and conclusion not in known:
+                print(
+                    "Rule fired:",
+                    " AND ".join(conditions),
+                    "->",
+                    conclusion
+                )
+
+                known.add(conclusion)
+                changed = True
+
+    return known
+
+# Backward Chaining
+def backward_chaining(goal, facts, rules, visited=None):
+    if visited is None:
+        visited = set()
+
+    print("Checking:", goal)
+
+    if goal in facts:
+        print(goal, "is a fact.")
+        return True
+
+    if goal in visited:
+        return False
+
+    visited.add(goal)
+
+    for conditions, conclusion in rules:
+        if conclusion == goal:
+            print(
+                "Using rule:",
+                " AND ".join(conditions),
+                "->",
+                conclusion
+            )
+
+            if all(
+                backward_chaining(condition, facts, rules, visited)
+                for condition in conditions
+            ):
+                return True
+
+    return False
+
+
+# Main Program
+print("Initial Facts:", facts)
+
+result = forward_chaining(facts, rules)
+
+print("\nFacts after Forward Chaining:", result)
+
+goal = "medicine"
+
+print("\nBackward Chaining:")
+if backward_chaining(goal, facts, rules):
+    print("Goal", goal, "can be proved.")
+else:
+    print("Goal", goal, "cannot be proved.")
