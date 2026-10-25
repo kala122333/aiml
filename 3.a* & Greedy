@@ -1,4 +1,4 @@
-A Search Algorithm
+#A Search Algorithm
 
 import heapq
 
@@ -54,7 +54,7 @@ print("Total cost:", cost)
 
 
 
-Greedy Best-First Search
+#Greedy Best-First Search
 
 import heapq
 
