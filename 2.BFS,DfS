@@ -1,4 +1,4 @@
-BFS
+#BFS
 
 from collections import deque
 
@@ -52,7 +52,7 @@ print("Number of Moves:", len(path) - 1)
 
 
 
-DFS
+#DFS
 
 def dfs(maze, start, goal):
     rows = len(maze)
