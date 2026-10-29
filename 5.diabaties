@@ -4,55 +4,59 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # Load dataset
-url = "https://raw.githubusercontent.com/joyb05/PIMA-Indian-Diabetes-Dataset/master/diabetes.csv"
-df = pd.read_csv(url)
+df = pd.read_csv("heart.csv")
+# heart dataset link : https://github.com/kb22/Heart-Disease-Prediction/blob/master/dataset.csv
+# diabetes dataset link : https://github.com/plotly/datasets/blob/master/diabetes.csv
+# titanic dataset link : https://github.com/datasciencedojo/datasets/blob/master/titanic.csv
 
-# Display first 5 rows
-print("First 5 rows:")
-print(df.head())
-
-# Data cleaning
+# Remove duplicate rows
 df = df.drop_duplicates()
 
-# Missing value handling
-columns = ["Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI"]
+# (ONLY FOR TITANIC DATASET) Drop unnecessary columns and Cabin due to many missing values
+df = df.drop(columns=['PassengerId', 'Name', 'Ticket', 'Cabin'])
 
-for col in columns:
-    df[col] = df[col].replace(0, df[col].median())
+# Handle missing values
+df = df.fillna(df.median())
+#diabetes: df = df.fillna(df.median(numeric_only=True))
+#titanic: num_cols = df.select_dtypes(include='number').columns     df[num_cols] = df[num_cols].fillna(df[num_cols].median())
+#titanic: cat_cols = df.select_dtypes(include='object').columns     for col in cat_cols:        df[col] = df[col].fillna(df[col].mode()[0])
 
-print("\nMissing values:")
-print(df.isnull().sum())
 
 # Statistical analysis
-print("\nStatistical Analysis:")
 print(df.describe())
 
-# Separate features and target
-X = df.drop("Outcome", axis=1)
-y = df["Outcome"]
-
-# Feature scaling
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
-# Split dataset
-X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=42
-)
-
-print("\nTraining data:", X_train.shape)
-print("Testing data:", X_test.shape)
-
 # Histograms
-df.hist(figsize=(12, 8))
-plt.suptitle("Histograms")
+df.hist(figsize=(10, 8))
 plt.tight_layout()
 plt.show()
 
 # Boxplots
-plt.figure(figsize=(12, 6))
-df.boxplot()
-plt.xticks(rotation=45)
-plt.title("Boxplots")
-plt.tight_layout()
+df.boxplot(figsize=(10, 5))
 plt.show()
+
+# Encode categorical columns : dont write for diabetes dataset
+cat = ['sex', 'cp', 'fbs', 'restecg', 'exang',
+       'slope', 'ca', 'thal']
+#titanic:  cat = ['Sex', 'Embarked', 'Pclass'] 
+#for df for titanicwrite is at below.
+df = pd.get_dummies(df, columns=cat, drop_first=True, dtype=int)
+
+# Separate features and target
+X = df.drop('target', axis=1) 
+y = df['target']              
+#Diabetes dataset: X = df.drop('Outcome', axis=1).......#Y = df['Outcome']
+#Titanic dataset: X = df.drop('Survived', axis=1).......y = df['Survived']
+
+# Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Scale features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+print("Training data:", X_train.shape)
+print("Testing data:", X_test.shape)
+print("Preprocessing completed.")
